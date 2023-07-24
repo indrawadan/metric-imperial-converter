@@ -1,0 +1,69 @@
+{
+	"info": {
+		"_postman_id": "c9163613-7df1-48f2-bb24-306d4dbcaad4",
+		"name": "MetricToImperial",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Add Conversion",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n         \"sourceUnit\": \"meters\",\n         \"targetUnit\": \"feet\",\n         \"conversionRate\": 3.28084\n      }"
+				},
+				"url": {
+					"raw": "http://localhost:8080/api/conversion/add",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"conversion",
+						"add"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Convert",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"value\": 10.0,\n  \"sourceUnit\": \"meters\",\n  \"targetUnit\": \"feet\"\n}"
+				},
+				"url": {
+					"raw": "http://localhost:8080/api/conversion/convert",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"conversion",
+						"convert"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}
