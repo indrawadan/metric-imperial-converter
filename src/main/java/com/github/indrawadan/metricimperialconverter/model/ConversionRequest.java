@@ -24,15 +24,15 @@ public class ConversionRequest {
         return sourceUnit;
     }
 
-    public void setSourceUnit(String sourceUnit) {
+    /*public void setSourceUnit(String sourceUnit) {
         this.sourceUnit = sourceUnit;
-    }
+    }*/
 
     public String getTargetUnit() {
         return targetUnit;
     }
 
-    public void setTargetUnit(String targetUnit) {
+/*    public void setTargetUnit(String targetUnit) {
         this.targetUnit = targetUnit;
-    }
+    }*/
 }

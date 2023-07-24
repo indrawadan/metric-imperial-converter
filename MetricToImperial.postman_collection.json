@@ -17,7 +17,7 @@
 				],
 				"body": {
 					"mode": "raw",
-					"raw": "{\n         \"sourceUnit\": \"meters\",\n         \"targetUnit\": \"feet\",\n         \"conversionRate\": 3.28084\n      }"
+					"raw": "{\n         \"sourceUnit\": \"meters\",\n         \"targetUnit\": \"feet\",\n         \"conversionRate\": 3.28084,\n         \"constant\":0,\n         \"offsetAction\": null\n}"
 				},
 				"url": {
 					"raw": "http://localhost:8080/api/conversion/add",
@@ -47,7 +47,7 @@
 				],
 				"body": {
 					"mode": "raw",
-					"raw": "{\n  \"value\": 10.0,\n  \"sourceUnit\": \"meters\",\n  \"targetUnit\": \"feet\"\n}"
+					"raw": "{\n  \"value\": 25.0,\n  \"sourceUnit\": \"meters\",\n  \"targetUnit\": \"feet\"\n}"
 				},
 				"url": {
 					"raw": "http://localhost:8080/api/conversion/convert",

@@ -29,7 +29,7 @@ class ConversionRuleServiceImplTest {
     @Test
     public void testAddConversionRule_Success() {
         // Prepare data
-        ConversionRule rule = new ConversionRule("meter", "feet", 3.28084);
+        ConversionRule rule = new ConversionRule("meter", "feet", 3.28084,0,null);
 
         // Mock the database query
         when(jdbcTemplate.update(anyString(), anyString(), anyString(), anyDouble())).thenReturn(1);
@@ -48,19 +48,19 @@ class ConversionRuleServiceImplTest {
     @Test
     public void testAddConversionRule_InvalidRule() {
         // Prepare an invalid conversion rule with an empty source unit
-        final ConversionRule rule1 = new ConversionRule("", "feet", 3.28084);
+        final ConversionRule rule1 = new ConversionRule("", "feet", 3.28084,0,null);
 
         // Call the method and expect it to throw IllegalArgumentException
         assertThrows(IllegalArgumentException.class, () -> conversionService.addConversionRule(rule1));
 
         // Prepare an invalid conversion rule with a null target unit
-        final ConversionRule rule2 = new ConversionRule("meter", null, 3.28084);
+        final ConversionRule rule2 = new ConversionRule("meter", null, 3.28084,0,null);
 
         // Call the method and expect it to throw IllegalArgumentException
         assertThrows(IllegalArgumentException.class, () -> conversionService.addConversionRule(rule2));
 
         // Prepare an invalid conversion rule with a negative conversion rate
-        final ConversionRule rule3 = new ConversionRule("meter", "feet", -3.28084);
+        final ConversionRule rule3 = new ConversionRule("meter", "feet", -3.28084,0,null);
 
         // Call the method and expect it to throw IllegalArgumentException
         assertThrows(IllegalArgumentException.class, () -> conversionService.addConversionRule(rule3));
@@ -72,7 +72,7 @@ class ConversionRuleServiceImplTest {
     @Test
     public void testConvert_Success() {
         // Prepare data
-        ConversionRule rule = new ConversionRule("meter", "feet", 3.28084);
+        ConversionRule rule = new ConversionRule("meter", "feet", 3.28084,0,null);
         ConversionRequest request = new ConversionRequest("meter", "feet", 5.0);
 
         // Mock the database query to return the conversion rate

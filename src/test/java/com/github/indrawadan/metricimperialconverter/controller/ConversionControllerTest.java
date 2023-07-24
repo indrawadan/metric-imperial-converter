@@ -5,9 +5,6 @@ import com.github.indrawadan.metricimperialconverter.model.ConversionRule;
 import com.github.indrawadan.metricimperialconverter.service.ConversionService;
 
 import org.mockito.MockitoAnnotations;
-import org.springframework.test.web.servlet.MockMvc;
-
-
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.BeforeEach;
 import org.mockito.InjectMocks;
@@ -20,7 +17,7 @@ import org.springframework.http.HttpStatus;
 import static org.mockito.Mockito.*;
 
 class ConversionControllerTest {
-    private MockMvc mockMvc;
+
     @Mock
     private ConversionService conversionService;
 
@@ -35,7 +32,7 @@ class ConversionControllerTest {
     @Test
     void testAddConversionRule_Success() throws Exception {
         // data
-        ConversionRule rule = new ConversionRule("meter", "feet", 3.28084);
+        ConversionRule rule = new ConversionRule("meter", "feet", 3.28084,0,null);
 
         // mock conversion service
         doNothing().when(conversionService).addConversionRule(any(ConversionRule.class));
