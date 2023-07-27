@@ -14,6 +14,7 @@ import javax.script.ScriptException;
 
 @Service
 public class ConversionRuleServiceImpl{
+    @Autowired
     private  JdbcTemplate jdbcTemplate;
 
 
