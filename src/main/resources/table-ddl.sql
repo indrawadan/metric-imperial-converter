@@ -1,9 +1,13 @@
+-- Drop the table if it exists
+DROP TABLE IF EXISTS conversion_rules;
+
+-- Create the conversion_rules table
 CREATE TABLE conversion_rules (
     id SERIAL PRIMARY KEY,
-    source_unit VARCHAR(255) NOT NULL,
-    target_unit VARCHAR(255) NOT NULL,
-    conversion_rate DOUBLE PRECISION NOT NULL,
-    constant int null,
-    offset_action VARCHAR(255) null,
-    CONSTRAINT uk_source_target_unit UNIQUE (source_unit, target_unit)
+    source_unit VARCHAR(50) NOT NULL,
+    target_unit VARCHAR(50) NOT NULL,
+    formula_constant DOUBLE PRECISION,
+    formula VARCHAR(255) NOT NULL,
+    is_metric_to_imperial BOOLEAN NOT NULL,
+    CONSTRAINT unique_conversion_rule UNIQUE (source_unit, target_unit)
 );

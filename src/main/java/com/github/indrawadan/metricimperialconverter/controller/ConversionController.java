@@ -13,11 +13,11 @@ import com.github.indrawadan.metricimperialconverter.model.ConversionRequest;
 @RestController
 @RequestMapping("/api/conversion")
 public class ConversionController {
-    private final ConversionService conversionService;
+    @Autowired
+    private ConversionService conversionService;
 
     @Autowired
-    public ConversionController(ConversionService conversionService) {
-        this.conversionService = conversionService;
+    public ConversionController() {
     }
 
     @PostMapping("/add")
