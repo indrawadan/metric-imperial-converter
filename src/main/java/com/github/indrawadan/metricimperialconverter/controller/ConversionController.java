@@ -1,5 +1,6 @@
 package com.github.indrawadan.metricimperialconverter.controller;
 
+import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -22,6 +23,14 @@ public class ConversionController {
 
     @PostMapping("/add")
     public ResponseEntity<String> addConversionRule(@RequestBody ConversionRule rule) {
+        if (rule == null || !StringUtils.hasLength(rule.getSourceUnit()) || !StringUtils.hasLength(rule.getTargetUnit())) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Source unit and target unit must not be empty.");
+        }
+
+        if (rule.getFormulaConstant() < 0) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Invalid conversion rule. Conversion rate must be a non-negative value.");
+        }
+
         try {
             conversionService.addConversionRule(rule);
             return new ResponseEntity<>("Conversion rule added successfully!", HttpStatus.CREATED);

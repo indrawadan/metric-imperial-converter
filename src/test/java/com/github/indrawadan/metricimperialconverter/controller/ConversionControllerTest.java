@@ -1,13 +1,14 @@
 package com.github.indrawadan.metricimperialconverter.controller;
 
 
+import com.github.indrawadan.metricimperialconverter.model.ConversionRequest;
 import com.github.indrawadan.metricimperialconverter.model.ConversionRule;
 import com.github.indrawadan.metricimperialconverter.service.ConversionService;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.junit.MockitoJUnitRunner;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
@@ -15,7 +16,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
-@ExtendWith(MockitoExtension.class)
+@RunWith(MockitoJUnitRunner.class)
 public class ConversionControllerTest {
 
     @Mock
@@ -43,7 +44,7 @@ public class ConversionControllerTest {
         verify(conversionService, times(1)).addConversionRule(rule);
     }
 
-   /* @Test
+   @Test
     public void testAddConversionRule_InvalidInput() {
         // Prepare an invalid conversion rule with an empty source unit
         ConversionRule rule = new ConversionRule("", "feet", 3.28084, "x * c", true);
@@ -57,9 +58,9 @@ public class ConversionControllerTest {
 
         // Verify that the service method was not called
         verify(conversionService, never()).addConversionRule(rule);
-    }*/
+    }
 
-    /*@Test
+    @Test
     public void testConvertValue_Success() {
         // Prepare data
         ConversionRequest request = new ConversionRequest("meter", "feet", 5.0);
@@ -115,5 +116,5 @@ public class ConversionControllerTest {
 
         // Verify that the service method was called
         verify(conversionService, times(1)).convert(request);
-    }*/
+    }
 }

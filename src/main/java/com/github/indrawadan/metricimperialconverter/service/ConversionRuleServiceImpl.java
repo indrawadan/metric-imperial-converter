@@ -13,7 +13,7 @@ import javax.script.ScriptEngineManager;
 import javax.script.ScriptException;
 
 @Service
-public class ConversionRuleServiceImpl{
+public class ConversionRuleServiceImpl implements ConversionService{
     @Autowired
     private  JdbcTemplate jdbcTemplate;
 
@@ -23,6 +23,7 @@ public class ConversionRuleServiceImpl{
     }
 
     public void addConversionRule(ConversionRule rule) {
+
         if (!StringUtils.hasLength(rule.getSourceUnit()) || !StringUtils.hasLength(rule.getTargetUnit())) {
             throw new IllegalArgumentException("Source unit and target unit must not be empty.");
         }
@@ -58,7 +59,7 @@ public class ConversionRuleServiceImpl{
                     });
 
             if (rule == null) {
-                throw new IllegalArgumentException("Conversion rule not found for the given units.");
+                throw new EmptyResultDataAccessException(1);
             }
 
             // Calculate and return the converted value using the formula from the database
@@ -69,14 +70,13 @@ public class ConversionRuleServiceImpl{
             return evaluateFormula(formula, formulaConstant, value);
         } catch (EmptyResultDataAccessException e) {
             throw new IllegalArgumentException("Conversion rule not found for the given units.");
-        } catch (Exception e) {
-            e.printStackTrace();
-            throw new IllegalArgumentException("An error occurred during the conversion process.");
+        } catch ( RuntimeException e) {
+            throw new IllegalArgumentException("An error occurred while adding the formula.");
         }
     }
 
 
-    private double evaluateFormula(String formula, double formulaConstant, double value) {
+    double evaluateFormula(String formula, double formulaConstant, double value) {
         ScriptEngineManager manager = new ScriptEngineManager();
         ScriptEngine engine = manager.getEngineByName("js");
         try {
@@ -86,9 +86,15 @@ public class ConversionRuleServiceImpl{
             if (result instanceof Number) {
                 return ((Number) result).doubleValue();
             }
+            else {
+                throw new IllegalArgumentException("Invalid formula or error occurred while evaluating the formula.");
+            }
         } catch (ScriptException e) {
             throw new IllegalArgumentException("Invalid formula or error occurred while evaluating the formula.");
         }
-        throw new IllegalArgumentException("Invalid formula or error occurred while evaluating the formula.");
+        catch ( IllegalArgumentException e) {
+            throw new IllegalArgumentException("Invalid formula or error occurred while evaluating the formula.");
+        }
+
     }
 }

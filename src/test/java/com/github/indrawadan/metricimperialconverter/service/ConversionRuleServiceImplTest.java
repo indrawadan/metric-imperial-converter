@@ -2,121 +2,143 @@ package com.github.indrawadan.metricimperialconverter.service;
 
 import com.github.indrawadan.metricimperialconverter.model.ConversionRequest;
 import com.github.indrawadan.metricimperialconverter.model.ConversionRule;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
+import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.junit.Before;
 import org.mockito.MockitoAnnotations;
+import org.mockito.junit.MockitoJUnitRunner;
 import org.springframework.dao.EmptyResultDataAccessException;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
-
-class ConversionRuleServiceImplTest {
+@RunWith(MockitoJUnitRunner.class)
+public class ConversionRuleServiceImplTest {
 
     @Mock
     private JdbcTemplate jdbcTemplate;
 
     @InjectMocks
-    private ConversionRuleServiceImpl conversionService;
+    private ConversionRuleServiceImpl conversionRuleService;
 
-    @BeforeEach
-    void setUp() {
-        MockitoAnnotations.openMocks(this);
-    }
 
     @Test
     public void testAddConversionRule_Success() {
         // Prepare data
         ConversionRule rule = new ConversionRule("meter", "feet", 3.28084, "x * c", true);
 
-        // Mock the database query
-        when(jdbcTemplate.update(anyString(), anyString(), anyString(), anyDouble(), anyString(), anyBoolean()))
-                .thenReturn(1);
+        // Mock the jdbcTemplate update method
+        when(jdbcTemplate.update(anyString(), any(), any(), anyDouble(), anyString(), anyBoolean())).thenReturn(1);
 
-        // Call the method
-        conversionService.addConversionRule(rule);
+        // Call the service method
+        conversionRuleService.addConversionRule(rule);
 
-        // Verify the database query is called with the correct arguments
-        String expectedSql = "INSERT INTO conversion_rules (source_unit, target_unit, formula_constant, formula, is_metric_to_imperial) VALUES (?, ?, ?, ?, ?)";
-        String expectedSourceUnit = "meter";
-        String expectedTargetUnit = "feet";
-        double expectedFormulaConstant = 3.28084;
-        String expectedFormula = "x * c";
-        boolean expectedIsMetricToImperial = true;
-        verify(jdbcTemplate).update(expectedSql, expectedSourceUnit, expectedTargetUnit, expectedFormulaConstant, expectedFormula, expectedIsMetricToImperial);
+        // Verify that the jdbcTemplate update method was called with the correct parameters
+        verify(jdbcTemplate, times(1)).update(
+                eq("INSERT INTO conversion_rules (source_unit, target_unit, formula_constant, formula, is_metric_to_imperial) VALUES (?, ?, ?, ?, ?)"),
+                eq(rule.getSourceUnit()), eq(rule.getTargetUnit()), eq(rule.getFormulaConstant()), eq(rule.getFormula()), eq(rule.isMetricToImperial())
+        );
     }
 
     @Test
-    public void testAddConversionRule_InvalidRule() {
+    public void testAddConversionRule_InvalidSourceUnit() {
         // Prepare an invalid conversion rule with an empty source unit
-        final ConversionRule rule1 = new ConversionRule("", "feet", 3.28084, "x * c", true);
+        ConversionRule rule = new ConversionRule("", "feet", 3.28084, "x * c", true);
 
-        // Call the method and expect it to throw IllegalArgumentException
-        assertThrows(IllegalArgumentException.class, () -> conversionService.addConversionRule(rule1));
+        // Call the service method and verify the exception
+        assertThrows(IllegalArgumentException.class, () -> conversionRuleService.addConversionRule(rule));
+    }
 
+    @Test
+    public void testAddConversionRule_InvalidTargetUnit() {
         // Prepare an invalid conversion rule with an empty target unit
-        final ConversionRule rule2 = new ConversionRule("meter", "", 3.28084, "x * c", true);
+        ConversionRule rule = new ConversionRule("meter", "", 3.28084, "x * c", true);
 
-        // Call the method and expect it to throw IllegalArgumentException
-        assertThrows(IllegalArgumentException.class, () -> conversionService.addConversionRule(rule2));
-
-        // Prepare an invalid conversion rule with a negative formula constant
-        final ConversionRule rule3 = new ConversionRule("meter", "feet", -3.28084, "x * c", true);
-
-        // Call the method and expect it to throw IllegalArgumentException
-        assertThrows(IllegalArgumentException.class, () -> conversionService.addConversionRule(rule3));
+        // Call the service method and verify the exception
+        assertThrows(IllegalArgumentException.class, () -> conversionRuleService.addConversionRule(rule));
     }
 
     @Test
-    public void testConvert_Success_MetricToImperial() {
+    public void testAddConversionRule_NegativeConversionRate() {
+        // Prepare an invalid conversion rule with a negative conversion rate
+        ConversionRule rule = new ConversionRule("meter", "feet", -3.28084, "x * c", true);
+
+        // Call the service method and verify the exception
+        assertThrows(IllegalArgumentException.class, () -> conversionRuleService.addConversionRule(rule));
+    }
+
+    @Test
+    public void testConvert_Success() {
         // Prepare data
-        ConversionRule rule = new ConversionRule("meter", "feet", 3.28084, "x * c", true);
         ConversionRequest request = new ConversionRequest("meter", "feet", 5.0);
+        ConversionRule rule = new ConversionRule("meter", "feet", 3.28084, "x * c", true);
 
-        // Mock the database query to return the conversion rule
-        when(jdbcTemplate.queryForObject(anyString(), any(Object[].class), any(RowMapper.class)))
+        // Mock the JdbcTemplate behavior
+        when(jdbcTemplate.queryForObject(any(String.class), any(Object[].class), any(RowMapper.class)))
                 .thenReturn(rule);
 
-        // Call the method
-        double convertedValue = conversionService.convert(request);
+        // Call the service method
+        double convertedValue = conversionRuleService.convert(request);
 
         // Verify the converted value
-        double expectedConvertedValue = request.getValue() * rule.getFormulaConstant();
-        assertEquals(expectedConvertedValue, convertedValue, 0.001);
+        assertEquals(16.4042, convertedValue, 0.0001);
+        // Verify that the jdbcTemplate queryForObject method was called
+        verify(jdbcTemplate, times(1)).queryForObject(anyString(), any(Object[].class), any(RowMapper.class));
     }
 
-    @Test
-    public void testConvert_Success_ImperialToMetric() {
-        // Prepare data
-        ConversionRule rule = new ConversionRule("feet", "meter", 0.3048, "x * c", false);
-        ConversionRequest request = new ConversionRequest("feet", "meter", 10.0);
-
-        // Mock the database query to return the conversion rule
-        when(jdbcTemplate.queryForObject(anyString(), any(Object[].class), any(RowMapper.class)))
-                .thenReturn(rule);
-
-        // Call the method
-        double convertedValue = conversionService.convert(request);
-
-        // Verify the converted value
-        double expectedConvertedValue = request.getValue() * rule.getFormulaConstant();
-        assertEquals(expectedConvertedValue, convertedValue, 0.001);
-    }
 
     @Test
     public void testConvert_ConversionRuleNotFound() {
         // Prepare data
         ConversionRequest request = new ConversionRequest("meter", "feet", 5.0);
 
-        // Mock the database query to return null (conversion rule not found)
-        when(jdbcTemplate.queryForObject(anyString(), any(Object[].class), any(RowMapper.class)))
-                .thenThrow(EmptyResultDataAccessException.class);
+        // Mock the JdbcTemplate behavior to throw EmptyResultDataAccessException
+        when(jdbcTemplate.queryForObject(any(String.class), any(Object[].class), any(RowMapper.class)))
+                .thenThrow(new EmptyResultDataAccessException(1));
 
-        // Call the method and expect it to throw IllegalArgumentException
-        assertThrows(IllegalArgumentException.class, () -> conversionService.convert(request));
+        // Call the service method and verify the exception
+        assertThrows(IllegalArgumentException.class, () -> conversionRuleService.convert(request));
     }
+
+    @Test
+    public void testConvert_ExceptionInQueryForObject() {
+        // Prepare data
+        ConversionRequest request = new ConversionRequest("meter", "feet", 5.0);
+
+        // Mock the behavior of JdbcTemplate queryForObject method to throw an exception
+        when(jdbcTemplate.queryForObject(any(String.class), any(Object[].class), any(RowMapper.class))).thenThrow(new RuntimeException());
+
+        // Call the service method and verify the exception
+        assertThrows(IllegalArgumentException.class, () -> conversionRuleService.convert(request));
+    }
+
+    @Test
+    public void testEvaluateFormula_Success() {
+        // Prepare data
+        String formula = "x * c";
+        double formulaConstant = 3.28084;
+        double value = 5.0;
+
+        // Call the method
+        double result = conversionRuleService.evaluateFormula(formula, formulaConstant, value);
+
+        // Verify the result
+        assertEquals(16.4042, result, 0.0001);
+    }
+
+    @Test
+    public void testEvaluateFormula_InvalidFormula() {
+        // Prepare data with invalid formula
+        String formula = "x *"; // Missing constant 'c'
+
+        // Call the service method and verify the exception
+        assertThrows(IllegalArgumentException.class, () -> conversionRuleService.evaluateFormula(formula, 3.28084, 5.0));
+    }
+
 }

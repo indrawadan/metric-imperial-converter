@@ -17,7 +17,7 @@
 				],
 				"body": {
 					"mode": "raw",
-					"raw": "{\n         \"sourceUnit\": \"meters\",\n         \"targetUnit\": \"feet\",\n         \"conversionRate\": 3.28084,\n         \"constant\":0,\n         \"offsetAction\": null\n}"
+					"raw": "{\n  \"sourceUnit\": \"celsius\",\n  \"targetUnit\": \"fahrenheit\",\n  \"formulaConstant\": 32,\n  \"formula\": \"(x * 9/5) + c\",\n  \"isMetricToImperial\":true\n}"
 				},
 				"url": {
 					"raw": "http://localhost:8080/api/conversion/add",
@@ -47,7 +47,7 @@
 				],
 				"body": {
 					"mode": "raw",
-					"raw": "{\n  \"value\": 25.0,\n  \"sourceUnit\": \"meters\",\n  \"targetUnit\": \"feet\"\n}"
+					"raw": "{\n  \"value\": 25.0,\n  \"sourceUnit\": \"celsius\",\n  \"targetUnit\": \"fahrenheit\"\n}"
 				},
 				"url": {
 					"raw": "http://localhost:8080/api/conversion/convert",
